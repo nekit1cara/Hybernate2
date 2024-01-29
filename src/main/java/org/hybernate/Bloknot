@@ -1,0 +1,88 @@
+
+                                         !!!CREATE values!!!
+                                         !!!!!!!!!!!!!!!!!!!
+
+
+!!! ОТКРЫВАЕМ СЕССИЮ 
+        session = HybernateUtil.getSessionFactory().openSession();
+
+!!!ОТКРЫВАЕМ ТРАНЗАКЦИЮ
+        session.getTransaction().begin();
+
+                        !!!Примечание к session.getTransaction().begin(); :
+        
+!!! getTransaction():
+     Метод getTransaction() вызывается у объекта EntityManager,
+     который предоставляет доступ к функциональности JPA для взаимодействия с базой данных.
+     EntityManager представляет собой интерфейс для работы с сущностями (entities),
+    и через него вы можете выполнять операции, такие как сохранение, обновление,
+    удаление и извлечение данных из базы данных.
+
+!!! begin():
+      Метод begin() вызывается на объекте EntityTransaction, который предоставляется методом getTransaction().
+       EntityTransaction представляет собой транзакцию, которую вы начинаете перед выполнением операций над базой данных.
+      Транзакция обеспечивает атомарность, согласованность и изолированность ваших изменений в базе данных.
+
+        People samir = new People();
+        samir.setNamePeople("Alex");
+        samir.setLastnamePeople("Iagodin");
+        samir.setProfesionPeople("Jeweler");
+        samir.setPositionsPeople("Middle");
+        samir.setSalaryPeople(1000);
+
+!!! Фиксируем(Сохранияем) наши изменения в объекте(samir)
+    session.save(samir);
+
+!!! Сохраняем наши изменения (Транзакция завершается) и пушим её в базу
+    session.getTransaction().commit();
+
+!!!закрытие сессии
+    session.close();
+
+
+                                       `!!!UPDATE values!!!`
+                                       !!!!!!!!!!!!!!!!!!!!!
+            
+            
+session = HybernateUtil.getSessionFactory().openSession();
+
+    try {
+        session.getTransaction().begin();
+
+        People edik  = session.get(People.class, 3L); !!!3L = 3 Id
+
+            if (edik != null){
+                edik.setSalaryPeople(300);
+                session.merge(edik);    merge -> update!!!!
+            }
+
+        session.getTransaction().commit();
+
+    } catch (HibernateException e) {
+        if (session.getTransaction() != null){session.getTransaction().rollback();}
+        throw new RuntimeException(e);
+    } finally {
+        session.close();
+    }
+    
+    
+                                     !!!DELETE values!!!
+                                     !!!!!!!!!!!!!!!!!!!
+    
+ session  = HybernateUtil.getSessionFactory().openSession();
+
+    try {
+        session2.getTransaction().begin();
+        People samir = session2.get(People.class, 17L);
+            if (samir != null){
+                session2.delete(samir);
+            }
+            session2.getTransaction().commit();
+
+    } catch (HibernateException e) {
+        if (session2.getTransaction() != null){session2.getTransaction().rollback();}
+        throw new RuntimeException(e);
+
+    }finally {
+        session2.close();
+    }
